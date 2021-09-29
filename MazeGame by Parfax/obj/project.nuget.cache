@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "Aa7emf+szxBHlMxmO7Sp1+QFZqZJMEOwjUlqQ5dw/ANuEfu473tDOiOwrqzQb+6QOjJZombT58J+fGLxGt43bA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Admin\\RiderProjects\\maze_game\\MazeGame by Parfax\\MazeGame by Parfax.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.app.ref\\3.0.0\\microsoft.netcore.app.ref.3.0.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.0.0\\microsoft.windowsdesktop.app.ref.3.0.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.0.1\\microsoft.aspnetcore.app.ref.3.0.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.0.3\\microsoft.netcore.app.host.win-x64.3.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
