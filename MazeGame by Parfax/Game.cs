@@ -129,7 +129,7 @@ namespace ConsoleApp6
         {
             horizontal = 0;
             vertical = 0;
-            var input = Console.ReadKey();
+            var input = Console.ReadKey(true);
             switch (input.Key)
             {
                 case ConsoleKey.W:
