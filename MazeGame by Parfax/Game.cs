@@ -31,6 +31,8 @@ namespace ConsoleApp6
         // Checks if
         static bool is_game_end, is_wallkable = true;
 
+        private static int stepCount;
+
         #endregion
         
         public static void Play()
@@ -39,15 +41,16 @@ namespace ConsoleApp6
             Console.Title = "MazeGame by Parfax";
             GenerateMap();
             player_place();
-            draw();
+            Draw();
             while (!is_game_end)
             {
                 GetInput();
                 logic();
-                draw();
+                Draw();
             }
-
+            Console.WriteLine($"Всего сделано шагов: {stepCount}");
             Console.WriteLine("Wow, you won!");
+            Console.Read();
         }
 
         static void GenerateMap()
@@ -66,32 +69,35 @@ namespace ConsoleApp6
                     field[i, j] = symbol;
                 }
             }
+            symbol = ' ';
 
             finishX = rand.Next(0, width - 1);
             finishY = rand.Next(0, height - 1);
             field[finishY, finishX] = 'x';
         }
 
-        static void draw()
+        static void Draw()
         {
             int indent = width + 5;
+            
+            // The wall in front of your nose!
             if (!is_wallkable)
             {
                 Console.SetCursorPosition(indent, height - 13);
-                Console.Write(phrase);
-                is_wallkable = true;
+                Console.Write(phrase); // Say: I can't go :(
+                is_wallkable = true; // Now I can try to take a step.
             }
             else
             {
+                // Clear the phrase
                 for (int i = indent; i < indent+phrase.Length; i++)
                 {
                     Console.SetCursorPosition(i, height - 13);
-                    Console.Write(" ");
+                    Console.Write(' ');
                 }
             }
 
             Console.SetCursorPosition(0, 0);
-
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
@@ -101,8 +107,18 @@ namespace ConsoleApp6
                         symbol = player;
                         Console.ForegroundColor = ConsoleColor.Blue;
                     }
-                    else
+                    else if (((i >= position_Y && i <= position_Y + 3) &&
+                               (j >= position_X && j <= position_X + 3)) ||
+                              ((i <= position_Y && i >= position_Y - 3) &&
+                               (j <= position_X && j >= position_X - 3)) ||
+                              ((i <= position_Y && i >= position_Y + 3) &&
+                               (j >= position_X && j <= position_X + 3))||
+                              ((i >= position_Y && i <= position_Y - 3) &&
+                               (j <= position_X && j >= position_X - 3))
+                              )
                         symbol = field[i, j];
+                    else
+                        symbol = ' ';
 
                     Console.Write(symbol);
                     Console.ResetColor();
@@ -110,6 +126,25 @@ namespace ConsoleApp6
 
                 Console.WriteLine();
             }
+
+            // for (int i = 0; i < height; i++)
+            // {
+            //     for (int j = 0; j < width; j++)
+            //     {
+            //         if (i == position_Y && j == position_X)
+            //         {
+            //             symbol = player;
+            //             Console.ForegroundColor = ConsoleColor.Blue;
+            //         }
+            //         else
+            //             symbol = field[i, j];
+            //
+            //         Console.Write(symbol);
+            //         Console.ResetColor();
+            //     }
+            //
+            //     Console.WriteLine();
+            // }
         }
 
         static void player_place()
@@ -145,6 +180,7 @@ namespace ConsoleApp6
                     horizontal++;
                     break;
             }
+            stepCount++;
         }
 
         static bool is_walkable(int X, int Y)

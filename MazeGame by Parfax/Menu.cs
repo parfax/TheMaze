@@ -1,29 +1,86 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 
 namespace ConsoleApp6
 {
     class Menu
     {
 
-        // MENU
-        public static void Main(string[] args)
+        public static List<Option> options;
+        static int index;
+        static void Main(string[] args)
         {
-            Console.Title = "GAME MENU";
-            Console.Write("Руководство по игре:\n  # это стена\n  0 это игрок\n  x это финиш.\n");
-            Console.WriteLine("===============MENU===============\n" +
-                              " 1 Играть\n" +
-                              " 2 Выйти из игры\n==================================\nВаш выбор:");
-            int caseSwitch = int.Parse(Console.ReadLine());
-
-            switch (caseSwitch)
+            Console.Title = "The Maze | Main Menu";
+            Console.CursorVisible = false;
+            
+            
+            options = new List<Option>
             {
-                case 1:
-                    Console.Clear();
-                    Game.Play();
+                new Option("Играть", () =>
+                    {
+                        Console.Clear();
+                        Game.Play();
+                    }),
+                //new Option("А как играть?", () => ,
+                new Option("Выйти", () => Environment.Exit(0))
+            };
+            
+            DrawMenu(options, options[index]);
+
+            // Store key info in here
+            ConsoleKeyInfo keyinfo;
+            do
+            {
+                keyinfo = Console.ReadKey(true);
+                if (keyinfo.Key == ConsoleKey.DownArrow || keyinfo.Key == ConsoleKey.S)
+                {
+                    if (index + 1 < options.Count)
+                    {
+                        index++;
+                        DrawMenu(options, options[index]);
+                    }
+                }
+                if (keyinfo.Key == ConsoleKey.UpArrow || keyinfo.Key == ConsoleKey.W)
+                {
+                    if (index - 1 >= 0)
+                    {
+                        index--;
+                        DrawMenu(options, options[index]);
+                    }
+                }
+                
+                if (keyinfo.Key == ConsoleKey.Enter)
+                {
+                    options[index].Selected.Invoke();
                     break;
-                case 2:
-                    Console.WriteLine("Выходим из игры...");
-                    break;
+                }
+            }
+            while (keyinfo.Key != ConsoleKey.Escape);
+        }
+        static void DrawMenu(List<Option> options, Option selectedOption)
+        {
+            Console.SetCursorPosition(0,0);
+
+            foreach (Option option in options)
+            {
+                if (option == selectedOption)
+                    Console.Write("> ");
+                else
+                    Console.Write(' ');
+
+                Console.WriteLine(option.Name + ' ');
+            }
+        }
+        
+        public class Option
+        {
+            public string Name { get; }
+            public Action Selected { get; }
+
+            public Option(string name, Action selected)
+            {
+                Name = name;
+                Selected = selected;
             }
         }
     }
