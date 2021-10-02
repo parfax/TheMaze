@@ -107,16 +107,22 @@ namespace ConsoleApp6
                         symbol = player;
                         Console.ForegroundColor = ConsoleColor.Blue;
                     }
-                    else if (((i >= position_Y && i <= position_Y + 3) &&
-                               (j >= position_X && j <= position_X + 3)) ||
-                              ((i <= position_Y && i >= position_Y - 3) &&
-                               (j <= position_X && j >= position_X - 3)) ||
-                              ((i <= position_Y && i >= position_Y + 3) &&
-                               (j >= position_X && j <= position_X + 3))||
-                              ((i >= position_Y && i <= position_Y - 3) &&
-                               (j <= position_X && j >= position_X - 3))
-                              )
+                    else if ((i >= position_Y && i <= position_Y + 3) &&
+                               (j >= position_X && j <= position_X + 3))
                         symbol = field[i, j];
+                    
+                    else if ((i <= position_Y && i >= position_Y - 3) &&
+                                 (j <= position_X && j >= position_X - 3))
+                        symbol = field[i, j];
+                    
+                    else if((i <= position_Y && i >= position_Y - 3) &&
+                             (j >= position_X && j <= position_X + 3))
+                        symbol = field[i, j];
+                    
+                    else if((i >= position_Y && i <= position_Y + 3) &&
+                             (j <= position_X && j >= position_X - 3))
+                        symbol = field[i, j];
+                    
                     else
                         symbol = ' ';
 
