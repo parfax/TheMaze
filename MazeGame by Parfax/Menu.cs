@@ -8,7 +8,7 @@ namespace ConsoleApp6
 
         public static List<Option> options;
         static int index;
-        static void Main(string[] args)
+        public static void ReturnToTheMenu()
         {
             Console.Title = "The Maze | Main Menu";
             Console.CursorVisible = false;

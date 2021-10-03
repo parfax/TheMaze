@@ -10,3 +10,9 @@ C:\Users\AdminPC\RiderProjects\maze_game\MazeGame by Parfax\obj\Debug\MazeGame b
 C:\Users\AdminPC\RiderProjects\maze_game\MazeGame by Parfax\obj\Debug\MazeGame by Parfax.csproj.CoreCompileInputs.cache
 C:\Users\AdminPC\RiderProjects\maze_game\MazeGame by Parfax\obj\Debug\MazeGame_by_Parfax.exe
 C:\Users\AdminPC\RiderProjects\maze_game\MazeGame by Parfax\obj\Debug\MazeGame_by_Parfax.pdb
+C:\Users\Admin\RiderProjects\maze_game\MazeGame by Parfax\bin\Debug\MazeGame_by_Parfax.exe
+C:\Users\Admin\RiderProjects\maze_game\MazeGame by Parfax\bin\Debug\MazeGame_by_Parfax.pdb
+C:\Users\Admin\RiderProjects\maze_game\MazeGame by Parfax\obj\Debug\MazeGame by Parfax.csprojAssemblyReference.cache
+C:\Users\Admin\RiderProjects\maze_game\MazeGame by Parfax\obj\Debug\MazeGame by Parfax.csproj.CoreCompileInputs.cache
+C:\Users\Admin\RiderProjects\maze_game\MazeGame by Parfax\obj\Debug\MazeGame_by_Parfax.exe
+C:\Users\Admin\RiderProjects\maze_game\MazeGame by Parfax\obj\Debug\MazeGame_by_Parfax.pdb

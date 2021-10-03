@@ -31,6 +31,9 @@ namespace ConsoleApp6
         // Checks if
         static bool is_game_end, is_wallkable = true;
 
+        static int radiusOfView = 3;
+        
+        // Stat
         private static int stepCount;
 
         #endregion
@@ -38,7 +41,7 @@ namespace ConsoleApp6
         public static void Play()
         {
             Console.CursorVisible = false;
-            Console.Title = "MazeGame by Parfax";
+            Console.Title = "The Maze by Parfax";
             GenerateMap();
             player_place();
             Draw();
@@ -48,9 +51,25 @@ namespace ConsoleApp6
                 logic();
                 Draw();
             }
-            Console.WriteLine($"Всего сделано шагов: {stepCount}");
-            Console.WriteLine("Wow, you won!");
-            Console.Read();
+            Console.WriteLine($"Всего сделано {stepCount} шагов.");
+            Console.WriteLine("Ура, вы прошли лабиринт!\n");
+            
+            
+            Console.WriteLine("> Вернутся в главное меню");
+            ConsoleKeyInfo input;
+            do
+                input = Console.ReadKey(true);
+            while (input.Key != ConsoleKey.Enter);
+            
+            // Resetting everything on Enter
+            if (input.Key == ConsoleKey.Enter)
+            {
+                Console.ResetColor();
+                Console.Clear();
+                is_game_end = false;
+                stepCount = 0;
+                Menu.ReturnToTheMenu();
+            }
         }
 
         static void GenerateMap()
@@ -102,24 +121,26 @@ namespace ConsoleApp6
             {
                 for (int j = 0; j < width; j++)
                 {
+                    // Placing player to the next cell
                     if (i == position_Y && j == position_X)
                     {
                         symbol = player;
                         Console.ForegroundColor = ConsoleColor.Blue;
                     }
-                    else if ((i >= position_Y && i <= position_Y + 3) &&
-                               (j >= position_X && j <= position_X + 3))
+                    // Fog
+                    else if ((i >= position_Y && i <= position_Y + radiusOfView) &&
+                               (j >= position_X && j <= position_X + radiusOfView))
                         symbol = field[i, j];
                     
-                    else if ((i <= position_Y && i >= position_Y - 3) &&
+                    else if ((i <= position_Y && i >= position_Y - radiusOfView) &&
                                  (j <= position_X && j >= position_X - 3))
                         symbol = field[i, j];
                     
-                    else if((i <= position_Y && i >= position_Y - 3) &&
+                    else if((i <= position_Y && i >= position_Y - radiusOfView) &&
                              (j >= position_X && j <= position_X + 3))
                         symbol = field[i, j];
                     
-                    else if((i >= position_Y && i <= position_Y + 3) &&
+                    else if((i >= position_Y && i <= position_Y + radiusOfView) &&
                              (j <= position_X && j >= position_X - 3))
                         symbol = field[i, j];
                     
@@ -132,25 +153,6 @@ namespace ConsoleApp6
 
                 Console.WriteLine();
             }
-
-            // for (int i = 0; i < height; i++)
-            // {
-            //     for (int j = 0; j < width; j++)
-            //     {
-            //         if (i == position_Y && j == position_X)
-            //         {
-            //             symbol = player;
-            //             Console.ForegroundColor = ConsoleColor.Blue;
-            //         }
-            //         else
-            //             symbol = field[i, j];
-            //
-            //         Console.Write(symbol);
-            //         Console.ResetColor();
-            //     }
-            //
-            //     Console.WriteLine();
-            // }
         }
 
         static void player_place()
