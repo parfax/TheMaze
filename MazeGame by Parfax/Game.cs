@@ -4,46 +4,49 @@ namespace ConsoleApp6
 {
     public class Game
     {
-        
         #region Configuration
-        
+
         // Map size
         static int width = 35, height = 23;
-        
+
         // Player coordinates
         static int position_X, position_Y;
-        
+
         // Input axies
         static int horizontal, vertical;
-        
+
         // The finish coordinates
         static int finishX, finishY;
-        
+
         // Cell array
         static char[,] field = new char[height, width];
-        
+
         // Symbols that fill the cells
         static char symbol, player = '0';
-        
+
         // Phrases
-        static string phrase = "Мысли: Кхм... Я не привидение чтобы  проходить сквозь стены.";
-        
+        static string[] phrases =
+            {"Кхм... Я не привидение чтобы  проходить сквозь стены.", "Если бы всё было так просто..."};
+
+        static int indent = width + 5;
+
         // Checks if
-        static bool is_game_end, is_wallkable = true;
+        private static bool is_game_end, is_wallkable = true, can_say;
 
         static int radiusOfView = 3;
-        
+
         // Stat
         private static int stepCount;
 
         #endregion
         
+        // Game cycle
         public static void Play()
         {
             Console.CursorVisible = false;
             Console.Title = "The Maze by Parfax";
             GenerateMap();
-            player_place();
+            SpawnPlayer();
             Draw();
             while (!is_game_end)
             {
@@ -51,16 +54,18 @@ namespace ConsoleApp6
                 logic();
                 Draw();
             }
+
             Console.WriteLine($"Всего сделано {stepCount} шагов.");
             Console.WriteLine("Ура, вы прошли лабиринт!\n");
-            
-            
+
+            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.Black;
             Console.WriteLine("> Вернутся в главное меню");
             ConsoleKeyInfo input;
             do
                 input = Console.ReadKey(true);
             while (input.Key != ConsoleKey.Enter);
-            
+
             // Resetting everything on Enter
             if (input.Key == ConsoleKey.Enter)
             {
@@ -71,6 +76,8 @@ namespace ConsoleApp6
                 Menu.ReturnToTheMenu();
             }
         }
+
+        #region Initialization
 
         static void GenerateMap()
         {
@@ -88,6 +95,7 @@ namespace ConsoleApp6
                     field[i, j] = symbol;
                 }
             }
+
             symbol = ' ';
 
             finishX = rand.Next(0, width - 1);
@@ -95,21 +103,27 @@ namespace ConsoleApp6
             field[finishY, finishX] = 'x';
         }
 
+        static void SpawnPlayer()
+        {
+            Random rand = new Random();
+            position_X = rand.Next(0, width - 1);
+            position_Y = rand.Next(0, height - 1);
+        }
+
+        #endregion
+
         static void Draw()
         {
-            int indent = width + 5;
-            
             // The wall in front of your nose!
             if (!is_wallkable)
             {
                 Console.SetCursorPosition(indent, height - 13);
-                Console.Write(phrase); // Say: I can't go :(
-                is_wallkable = true; // Now I can try to take a step.
+                Console.Write($"Мысли: {phrases[0]}");
+                is_wallkable = true;
             }
             else
             {
-                // Clear the phrase
-                for (int i = indent; i < indent+phrase.Length; i++)
+                for (int i = indent; i < indent + 7 + phrases[0].Length; i++)
                 {
                     Console.SetCursorPosition(i, height - 13);
                     Console.Write(' ');
@@ -129,21 +143,21 @@ namespace ConsoleApp6
                     }
                     // Fog
                     else if ((i >= position_Y && i <= position_Y + radiusOfView) &&
-                               (j >= position_X && j <= position_X + radiusOfView))
+                             (j >= position_X && j <= position_X + radiusOfView))
                         symbol = field[i, j];
-                    
+
                     else if ((i <= position_Y && i >= position_Y - radiusOfView) &&
-                                 (j <= position_X && j >= position_X - 3))
-                        symbol = field[i, j];
-                    
-                    else if((i <= position_Y && i >= position_Y - radiusOfView) &&
-                             (j >= position_X && j <= position_X + 3))
-                        symbol = field[i, j];
-                    
-                    else if((i >= position_Y && i <= position_Y + radiusOfView) &&
                              (j <= position_X && j >= position_X - 3))
                         symbol = field[i, j];
-                    
+
+                    else if ((i <= position_Y && i >= position_Y - radiusOfView) &&
+                             (j >= position_X && j <= position_X + 3))
+                        symbol = field[i, j];
+
+                    else if ((i >= position_Y && i <= position_Y + radiusOfView) &&
+                             (j <= position_X && j >= position_X - 3))
+                        symbol = field[i, j];
+
                     else
                         symbol = ' ';
 
@@ -155,18 +169,7 @@ namespace ConsoleApp6
             }
         }
 
-        static void player_place()
-        {
-            Random rand = new Random();
-            position_X = rand.Next(0, width - 1);
-            position_Y = rand.Next(0, height - 1);
-        }
-
-        static void logic()
-        {
-            try_go_to(position_X + horizontal, position_Y + vertical);
-            check_finish();
-        }
+        #region Inspections
 
         static void GetInput()
         {
@@ -187,9 +190,24 @@ namespace ConsoleApp6
                 case ConsoleKey.D:
                     horizontal++;
                     break;
+                case ConsoleKey.Escape:
+                    Console.SetCursorPosition(indent, height - 13);
+                    Console.Write($"Мысли: {phrases[1]}");
+                    GetInput();
+                    return;
+                default:
+                    return;
             }
+
             stepCount++;
         }
+
+        static void logic()
+        {
+            try_go_to(position_X + horizontal, position_Y + vertical);
+            check_finish();
+        }
+
 
         static bool is_walkable(int X, int Y)
         {
@@ -200,6 +218,12 @@ namespace ConsoleApp6
             }
 
             return true;
+        }
+        
+        static void try_go_to(int newX, int newY)
+        {
+            if (can_go_to(newX, newY))
+                go_to(newX, newY);
         }
 
         static bool can_go_to(int newX, int newY)
@@ -217,16 +241,12 @@ namespace ConsoleApp6
             position_Y = newY;
         }
 
-        static void try_go_to(int newX, int newY)
-        {
-            if (can_go_to(newX, newY))
-                go_to(newX, newY);
-        }
-
         static void check_finish()
         {
             if (position_X == finishX && position_Y == finishY)
                 is_game_end = true;
         }
+        
+        #endregion
     }
 }
