@@ -1,4 +1,5 @@
 ﻿using System;
+using static System.Console;
 
 namespace ConsoleApp6
 {
@@ -7,31 +8,28 @@ namespace ConsoleApp6
         #region Configuration
 
         // Map size
-        static int width = 35, height = 23;
+        public static int width = 35;
+        public static int height = 23;
 
-        // Player coordinates
-        static int position_X, position_Y;
+        // Cell array
+        static World world = new World(height, width);
+
+        static Player player = new Player();
+
 
         // Input axies
         static int horizontal, vertical;
 
-        // The finish coordinates
-        static int finishX, finishY;
-
-        // Cell array
-        static char[,] field = new char[height, width];
-
         // Symbols that fill the cells
-        static char symbol, player = '0';
+        static char symbol;
 
         // Phrases
         static string[] phrases =
             {"Кхм... Я не привидение чтобы  проходить сквозь стены.", "Если бы всё было так просто..."};
 
-        static int indent = width + 5;
 
         // Checks if
-        private static bool is_game_end, is_wallkable = true, can_say;
+        private static bool is_wallkable = true;
 
         static int radiusOfView = 3;
 
@@ -39,133 +37,100 @@ namespace ConsoleApp6
         private static int stepCount;
 
         #endregion
-        
+
         // Game cycle
         public static void Play()
         {
-            Console.CursorVisible = false;
-            Console.Title = "The Maze by Parfax";
-            GenerateMap();
-            SpawnPlayer();
+            CursorVisible = false;
+            Title = "The Maze by Parfax";
+
+            world.GenerateNew();
+            player.Spawn();
             Draw();
-            while (!is_game_end)
+            while (!is_game_end())
             {
                 GetInput();
                 logic();
                 Draw();
             }
+            
+            Clear();
+            WriteLine($@"Ура, вы прошли лабиринт!
+Всего сделано {stepCount} шагов.
+");
 
-            Console.WriteLine($"Всего сделано {stepCount} шагов.");
-            Console.WriteLine("Ура, вы прошли лабиринт!\n");
-
-            Console.BackgroundColor = ConsoleColor.Gray;
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.WriteLine("> Вернутся в главное меню");
+            BackgroundColor = ConsoleColor.Gray;
+            ForegroundColor = ConsoleColor.Black;
+            Write("> Вернутся в главное меню ");
             ConsoleKeyInfo input;
             do
-                input = Console.ReadKey(true);
+                input = ReadKey(true);
             while (input.Key != ConsoleKey.Enter);
 
             // Resetting everything on Enter
             if (input.Key == ConsoleKey.Enter)
             {
-                Console.ResetColor();
-                Console.Clear();
-                is_game_end = false;
+                ResetColor();
+                Clear();
                 stepCount = 0;
                 Menu.ReturnToTheMenu();
             }
         }
 
-        #region Initialization
-
-        static void GenerateMap()
-        {
-            Random rand = new Random();
-
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
-                {
-                    if (rand.Next(1, 100) < 28)
-                        symbol = '#';
-                    else
-                        symbol = ' ';
-
-                    field[i, j] = symbol;
-                }
-            }
-
-            symbol = ' ';
-
-            finishX = rand.Next(0, width - 1);
-            finishY = rand.Next(0, height - 1);
-            field[finishY, finishX] = 'x';
-        }
-
-        static void SpawnPlayer()
-        {
-            Random rand = new Random();
-            position_X = rand.Next(0, width - 1);
-            position_Y = rand.Next(0, height - 1);
-        }
-
-        #endregion
-
-        static void Draw()
+        private static void Draw()
         {
             // The wall in front of your nose!
             if (!is_wallkable)
             {
-                Console.SetCursorPosition(indent, height - 13);
-                Console.Write($"Мысли: {phrases[0]}");
+                SetCursorPosition(0, height + 1);
+                Write($"Мысли: {phrases[0]}");
                 is_wallkable = true;
             }
             else
             {
-                for (int i = indent; i < indent + 7 + phrases[0].Length; i++)
+                for (int i = 0; i < 7 + phrases[0].Length; i++)
                 {
-                    Console.SetCursorPosition(i, height - 13);
-                    Console.Write(' ');
+                    SetCursorPosition(i, height + 1);
+                    Write(' ');
                 }
             }
 
-            Console.SetCursorPosition(0, 0);
+            SetCursorPosition(0, 0);
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
                     // Placing player to the next cell
-                    if (i == position_Y && j == position_X)
+                    if (i == player.Y && j == player.X)
                     {
-                        symbol = player;
-                        Console.ForegroundColor = ConsoleColor.Blue;
+                        symbol = '0';
+                        ForegroundColor = ConsoleColor.Blue;
                     }
                     // Fog
-                    else if ((i >= position_Y && i <= position_Y + radiusOfView) &&
-                             (j >= position_X && j <= position_X + radiusOfView))
-                        symbol = field[i, j];
+                    else if ((i >= player.Y && i <= player.Y + radiusOfView) &&
+                             (j >= player.X && j <= player.X + radiusOfView))
+                        symbol = world.GetElementAt(i, j);
 
-                    else if ((i <= position_Y && i >= position_Y - radiusOfView) &&
-                             (j <= position_X && j >= position_X - 3))
-                        symbol = field[i, j];
+                    else if ((i <= player.Y && i >= player.Y - radiusOfView) &&
+                             (j <= player.X && j >= player.X - 3))
+                        symbol = world.GetElementAt(i, j);
 
-                    else if ((i <= position_Y && i >= position_Y - radiusOfView) &&
-                             (j >= position_X && j <= position_X + 3))
-                        symbol = field[i, j];
+                    else if ((i <= player.Y && i >= player.Y - radiusOfView) &&
+                             (j >= player.X && j <= player.X + 3))
+                        symbol = world.GetElementAt(i, j);
 
-                    else if ((i >= position_Y && i <= position_Y + radiusOfView) &&
-                             (j <= position_X && j >= position_X - 3))
-                        symbol = field[i, j];
+                    else if ((i >= player.Y && i <= player.Y + radiusOfView) &&
+                             (j <= player.X && j >= player.X - 3))
+                        symbol = world.GetElementAt(i, j);
 
                     else
                         symbol = ' ';
 
-                    Console.Write(symbol);
-                    Console.ResetColor();
+                    Write(symbol);
+                    ResetColor();
                 }
 
-                Console.WriteLine();
+                WriteLine();
             }
         }
 
@@ -175,24 +140,34 @@ namespace ConsoleApp6
         {
             horizontal = 0;
             vertical = 0;
-            var input = Console.ReadKey(true);
+            var input = ReadKey(true);
             switch (input.Key)
             {
                 case ConsoleKey.W:
+                case ConsoleKey.UpArrow:
                     vertical--;
                     break;
                 case ConsoleKey.S:
+                case ConsoleKey.DownArrow:
                     vertical++;
                     break;
                 case ConsoleKey.A:
+                case ConsoleKey.LeftArrow:
                     horizontal--;
                     break;
                 case ConsoleKey.D:
+                case ConsoleKey.RightArrow:
                     horizontal++;
                     break;
                 case ConsoleKey.Escape:
-                    Console.SetCursorPosition(indent, height - 13);
-                    Console.Write($"Мысли: {phrases[1]}");
+                    for (int i = 0; i < 7 + phrases[0].Length; i++)
+                    {
+                        SetCursorPosition(i, height + 1);
+                        Write(' ');
+                    }
+
+                    SetCursorPosition(0, height + 1);
+                    Write($"Мысли: {phrases[1]}");
                     GetInput();
                     return;
                 default:
@@ -204,14 +179,14 @@ namespace ConsoleApp6
 
         static void logic()
         {
-            try_go_to(position_X + horizontal, position_Y + vertical);
-            check_finish();
+            try_go_to(player.X + horizontal, player.Y + vertical);
+            is_game_end();
         }
 
 
         static bool is_walkable(int X, int Y)
         {
-            if (field[Y, X] == '#')
+            if (world.GetElementAt(Y, X) == '#')
             {
                 is_wallkable = false;
                 return false;
@@ -219,7 +194,7 @@ namespace ConsoleApp6
 
             return true;
         }
-        
+
         static void try_go_to(int newX, int newY)
         {
             if (can_go_to(newX, newY))
@@ -237,16 +212,17 @@ namespace ConsoleApp6
 
         static void go_to(int newX, int newY)
         {
-            position_X = newX;
-            position_Y = newY;
+            player.X = newX;
+            player.Y = newY;
         }
 
-        static void check_finish()
+        static bool is_game_end()
         {
-            if (position_X == finishX && position_Y == finishY)
-                is_game_end = true;
+            if (world.GetElementAt(player.Y, player.X) == 'x')
+                return true;
+            return false;
         }
-        
+
         #endregion
     }
 }
