@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using static System.Console;
 
-namespace ConsoleApp6
+namespace MazeGame_by_Parfax
 {
     class Menu
     {
-        public static List<Option> options;
-        static int index;
+        private static List<Option> options;
+        private static int index;
 
         public static void ReturnToTheMenu()
         {
@@ -37,7 +37,7 @@ namespace ConsoleApp6
             HandleOptions();
         }
 
-        static void HowToPlay()
+        private static void HowToPlay()
         {
             Clear();
             
@@ -58,7 +58,7 @@ namespace ConsoleApp6
         }
 
 
-        static void HandleOptions()
+        private static void HandleOptions()
         {
             ConsoleKeyInfo keyinfo;
             do
@@ -82,7 +82,7 @@ namespace ConsoleApp6
             } while (keyinfo.Key != ConsoleKey.Escape);
         }
 
-        static void BackButton()
+        public static void BackButton()
         {
             BackgroundColor = ConsoleColor.Gray;
             ForegroundColor = ConsoleColor.Black;
@@ -92,16 +92,12 @@ namespace ConsoleApp6
                 input = ReadKey(true);
             while (input.Key != ConsoleKey.Enter);
 
-            // Resetting everything on Enter
-            if (input.Key == ConsoleKey.Enter)
-            {
-                ResetColor();
-                Clear();
-                ReturnToTheMenu();
-            }
+            ResetColor();
+            Clear();
+            ReturnToTheMenu();
         }
 
-        static void DrawMenu(List<Option> options, Option selectedOption)
+        private static void DrawMenu(List<Option> options, Option selectedOption)
         {
             SetCursorPosition(0, 6);
 
@@ -116,7 +112,7 @@ namespace ConsoleApp6
             }
         }
 
-        public class Option
+        private class Option
         {
             public string Name { get; }
             public Action Selected { get; }

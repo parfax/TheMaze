@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConsoleApp6
+namespace MazeGame_by_Parfax
 {
     public class World
     {
@@ -18,9 +18,9 @@ namespace ConsoleApp6
         {
             var rand = new Random();
 
-            for (int i = 0; i < height; i++)
+            for (var i = 0; i < height; i++)
             {
-                for (int j = 0; j < width; j++)
+                for (var j = 0; j < width; j++)
                 {
                     var symbol = rand.Next(1, 100) < 28 ? '#' : ' ';
 
@@ -28,8 +28,8 @@ namespace ConsoleApp6
                 }
             }
 
-            int finishX = rand.Next(0, width - 1);
-            int finishY = rand.Next(0, height - 1);
+            var finishX = rand.Next(0, width - 1);
+            var finishY = rand.Next(0, height - 1);
             Grid[finishY, finishX] = 'x';
         }
 

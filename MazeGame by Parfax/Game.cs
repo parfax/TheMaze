@@ -1,43 +1,42 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
+using ConsoleApp6;
 using static System.Console;
 
-namespace ConsoleApp6
+namespace MazeGame_by_Parfax
 {
     public class Game
     {
         #region Configuration
 
         // Map size
-        public static int width = 35;
-        public static int height = 23;
+        public const int width = 35;
+        public const int height = 23;
 
         // Cell array
-        static World world = new World(height, width);
+        private static World world = new World(height, width);
 
-        static Player player = new Player();
+        private static Player player = new Player();
 
 
         // Input axies
-        static int horizontal, vertical;
+        private static int horizontal, vertical;
 
         // Symbols that fill the cells
-        static char symbol;
+        private static char symbol;
 
         // Phrases
-        static string[] phrases =
+        private static string[] phrases =
             {"Кхм... Я не привидение чтобы  проходить сквозь стены.", "Если бы всё было так просто..."};
 
 
         // Checks if
-        private static bool is_wallkable = true;
-
-        static int radiusOfView = 3;
+        private static bool is_walkable = true;
 
         // Stat
+        private const int RadiusOfView = 3;
         private static int stepCount;
-        static Stopwatch timer = new Stopwatch();
+        private static Stopwatch timer = new Stopwatch();
 
         #endregion
 
@@ -54,45 +53,37 @@ namespace ConsoleApp6
             while (!is_game_end())
             {
                 GetInput();
-                logic();
+                Logic();
                 Draw();
             }
-            
+
             Clear();
             timer.Stop();
-            WriteLine($"Ура, вы прошли лабиринт за {Math.Round(timer.ElapsedMilliseconds / 1000f, 2)} сек.!\nВсего сделано {stepCount} шагов.\n");
-
-            BackgroundColor = ConsoleColor.Gray;
-            ForegroundColor = ConsoleColor.Black;
-            Write("> Вернутся в главное меню ");
-            ConsoleKeyInfo input;
-            do
-                input = ReadKey(true);
-            while (input.Key != ConsoleKey.Enter);
-
-            // Resetting everything on Enter
-            if (input.Key == ConsoleKey.Enter)
-            {
-                ResetColor();
-                timer.Reset();
-                Clear();
-                stepCount = 0;
-                Menu.ReturnToTheMenu();
-            }
+            
+            ForegroundColor = ConsoleColor.DarkYellow;
+            WriteLine("\n  Ура, вы прошли лабиринт!");
+            ResetColor();
+            WriteLine($"  Время прохождения лабиринта: {Math.Round(timer.ElapsedMilliseconds / 1000f, 2)} сек.");
+            WriteLine($"  Всего сделано {stepCount} шагов.\n");
+            
+            timer.Reset();
+            stepCount = 0;
+            SetCursorPosition(2, CursorTop);
+            Menu.BackButton();
         }
 
         private static void Draw()
         {
             // The wall in front of your nose!
-            if (!is_wallkable)
+            if (!is_walkable)
             {
                 SetCursorPosition(0, height + 1);
                 Write($"Мысли: {phrases[0]}");
-                is_wallkable = true;
+                is_walkable = true;
             }
             else
             {
-                for (int i = 0; i < 7 + phrases[0].Length; i++)
+                for (var i = 0; i < 7 + phrases[0].Length; i++)
                 {
                     SetCursorPosition(i, height + 1);
                     Write(' ');
@@ -100,9 +91,9 @@ namespace ConsoleApp6
             }
 
             SetCursorPosition(0, 0);
-            for (int i = 0; i < height; i++)
+            for (var i = 0; i < height; i++)
             {
-                for (int j = 0; j < width; j++)
+                for (var j = 0; j < width; j++)
                 {
                     // Placing player to the next cell
                     if (i == player.Y && j == player.X)
@@ -111,24 +102,13 @@ namespace ConsoleApp6
                         ForegroundColor = ConsoleColor.Blue;
                     }
                     // Fog
-                    else if ((i >= player.Y && i <= player.Y + radiusOfView) &&
-                             (j >= player.X && j <= player.X + radiusOfView))
+                    else if ((i >= player.Y - RadiusOfView && i <= player.Y + RadiusOfView) &&
+                             (j >= player.X - RadiusOfView && j <= player.X + RadiusOfView))
+                    {
                         symbol = world.GetElementAt(i, j);
+                    }
 
-                    else if ((i <= player.Y && i >= player.Y - radiusOfView) &&
-                             (j <= player.X && j >= player.X - 3))
-                        symbol = world.GetElementAt(i, j);
-
-                    else if ((i <= player.Y && i >= player.Y - radiusOfView) &&
-                             (j >= player.X && j <= player.X + 3))
-                        symbol = world.GetElementAt(i, j);
-
-                    else if ((i >= player.Y && i <= player.Y + radiusOfView) &&
-                             (j <= player.X && j >= player.X - 3))
-                        symbol = world.GetElementAt(i, j);
-
-                    else
-                        symbol = ' ';
+                    else symbol = ' ';
 
                     Write(symbol);
                     ResetColor();
@@ -140,7 +120,7 @@ namespace ConsoleApp6
 
         #region Inspections
 
-        static void GetInput()
+        private static void GetInput()
         {
             horizontal = 0;
             vertical = 0;
@@ -164,7 +144,7 @@ namespace ConsoleApp6
                     horizontal++;
                     break;
                 case ConsoleKey.Escape:
-                    for (int i = 0; i < 7 + phrases[0].Length; i++)
+                    for (var i = 0; i < 7 + phrases[0].Length; i++)
                     {
                         SetCursorPosition(i, height + 1);
                         Write(' ');
@@ -181,52 +161,58 @@ namespace ConsoleApp6
             stepCount++;
         }
 
-        static void logic()
+        private static void Logic()
         {
             try_go_to(player.X + horizontal, player.Y + vertical);
             is_game_end();
         }
 
 
-        static bool is_walkable(int X, int Y)
+        private static bool IsWalkable(int X, int Y)
         {
-            if (world.GetElementAt(Y, X) == '#')
-            {
-                is_wallkable = false;
-                return false;
-            }
-
-            return true;
+            if (world.GetElementAt(Y, X) != '#') return true;
+            is_walkable = false;
+            return false;
         }
 
-        static void try_go_to(int newX, int newY)
+        private static void try_go_to(int newX, int newY)
         {
             if (can_go_to(newX, newY))
                 go_to(newX, newY);
         }
 
-        static bool can_go_to(int newX, int newY)
+        private static bool can_go_to(int newX, int newY)
         {
             if (newX < 0 || newY < 0 || newX >= width || newY >= height)
                 return false;
-            if (!is_walkable(newX, newY))
-                return false;
-            return true;
+            return IsWalkable(newX, newY);
         }
 
-        static void go_to(int newX, int newY)
+        private static void go_to(int newX, int newY)
         {
             player.X = newX;
             player.Y = newY;
         }
 
-        static bool is_game_end()
+        private static bool is_game_end()
         {
-            if (world.GetElementAt(player.Y, player.X) == 'x')
-                return true;
-            return false;
+            return world.GetElementAt(player.Y, player.X) == 'x';
         }
 
         #endregion
+        
+        private static void CenterLine(ConsoleColor color = ConsoleColor.White,params string[] lines)
+        {
+            var verticalStart = (WindowHeight - lines.Length) / 2;
+            var verticalPosition = verticalStart;
+            foreach (var line in lines)
+            {
+                var horizontalStart = (WindowWidth - line.Length) / 2;
+                SetCursorPosition(horizontalStart, verticalPosition);
+                ForegroundColor = color;
+                Write(line);
+                ++verticalPosition;
+            }
+        }
     }
 }
