@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using static System.Console;
 
 namespace ConsoleApp6
@@ -35,6 +37,7 @@ namespace ConsoleApp6
 
         // Stat
         private static int stepCount;
+        static Stopwatch timer = new Stopwatch();
 
         #endregion
 
@@ -47,6 +50,7 @@ namespace ConsoleApp6
             world.GenerateNew();
             player.Spawn();
             Draw();
+            timer.Start();
             while (!is_game_end())
             {
                 GetInput();
@@ -55,9 +59,8 @@ namespace ConsoleApp6
             }
             
             Clear();
-            WriteLine($@"Ура, вы прошли лабиринт!
-Всего сделано {stepCount} шагов.
-");
+            timer.Stop();
+            WriteLine($"Ура, вы прошли лабиринт за {Math.Round(timer.ElapsedMilliseconds / 1000f, 2)} сек.!\nВсего сделано {stepCount} шагов.\n");
 
             BackgroundColor = ConsoleColor.Gray;
             ForegroundColor = ConsoleColor.Black;
@@ -71,6 +74,7 @@ namespace ConsoleApp6
             if (input.Key == ConsoleKey.Enter)
             {
                 ResetColor();
+                timer.Reset();
                 Clear();
                 stepCount = 0;
                 Menu.ReturnToTheMenu();

@@ -6,57 +6,58 @@ namespace ConsoleApp6
 {
     class Menu
     {
-
         public static List<Option> options;
         static int index;
+
         public static void ReturnToTheMenu()
         {
             Title = "The Maze | Main Menu";
             CursorVisible = false;
             
+            Write(@"  
+  _____ _          __  __   by @Parfax        
+ |_   _| |_  ___  |  \/  |__ _ ______    
+   | | | ' \/ -_) | |\/| / _` |_ / -_)
+   |_| |_||_\___| |_|  |_\__,_/__\___|
+                                      
+");
+
             options = new List<Option>
             {
                 new Option("Играть", () =>
-                    {
-                        Clear();
-                        Game.Play();
-                    }),
-                new Option("Загрузить лабиринт", () => HowToPlay()),
-                new Option("Мои достияжения", () => ShowAchievements()),
+                {
+                    Clear();
+                    Game.Play();
+                }),
                 new Option("Как играть", () => HowToPlay()),
                 new Option("Выйти", () => Environment.Exit(0))
             };
-            
+
             DrawMenu(options, options[index]);
             HandleOptions();
         }
+
         static void HowToPlay()
-                {
-                    Clear();
-                    
-                    WriteLine("Вам предстоит бродить по лабиринту в поиске выхода,");
-                    WriteLine("но найти его будет не просто из-за маленького поля зрения.");
-                    WriteLine("Лабиринт генерируется случайным образом\n");
-                    ForegroundColor = ConsoleColor.Blue;
-                    Write("   0");
-                    ResetColor();
-                    Write(" — главный герой\n");
-                    WriteLine("   # — это стена, вы не можете проходить сквозь неё");
-                    WriteLine("   x — это финиш, ваша цель\n");
-                    WriteLine("Управление клавишами W A S D или ↑ ← ↓ →\n");
-
-                    BackButton();
-                }
-
-        static void ShowAchievements()
         {
             Clear();
             
-            WriteLine($"Мои достижения ( из 7):");
+            WriteLine();
+            WriteLine("  Вам предстоит бродить по лабиринту в поиске выхода,");
+            WriteLine("  но найти его будет не просто из-за маленького поля зрения.");
+            WriteLine("  Лабиринт генерируется случайным образом\n");
+            ForegroundColor = ConsoleColor.Blue;
+            Write("    0");
+            ResetColor();
+            Write(" — главный герой\n");
+            WriteLine("    # — это стена, вы не можете проходить сквозь неё");
+            WriteLine("    x — это финиш, ваша цель\n");
+            WriteLine("  Управление клавишами W A S D или ↑ ← ↓ →\n");
             
+            SetCursorPosition(2, CursorTop);
             BackButton();
         }
-        
+
+
         static void HandleOptions()
         {
             ConsoleKeyInfo keyinfo;
@@ -90,7 +91,7 @@ namespace ConsoleApp6
             do
                 input = ReadKey(true);
             while (input.Key != ConsoleKey.Enter);
-        
+
             // Resetting everything on Enter
             if (input.Key == ConsoleKey.Enter)
             {
@@ -99,21 +100,22 @@ namespace ConsoleApp6
                 ReturnToTheMenu();
             }
         }
+
         static void DrawMenu(List<Option> options, Option selectedOption)
         {
-            SetCursorPosition(0,0);
+            SetCursorPosition(0, 6);
 
             foreach (Option option in options)
             {
                 if (option == selectedOption)
-                    Write("> ");
+                    Write("  > ");
                 else
-                    Write(' ');
+                    Write("  ");
 
-                WriteLine(option.Name + ' ');
+                WriteLine(option.Name + "  ");
             }
         }
-        
+
         public class Option
         {
             public string Name { get; }
